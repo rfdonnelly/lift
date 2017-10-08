@@ -1,45 +1,20 @@
 #[macro_use]
 extern crate clap;
 
-use clap::{App, Arg, AppSettings};
+mod cli;
+mod config;
 
 use std::cmp;
+use config::Config;
 
 fn main() {
-    let matches = App::new(crate_name!())
-        .setting(AppSettings::NextLineHelp)
-        .about("\nLift helps with barbell lift planning.")
-        .version(concat!("v", crate_version!()))
-        .author(crate_authors!())
-        .arg(Arg::with_name("bar")
-            .help("Sets the bar weight")
-            .short("b")
-            .long("bar")
-            .default_value("45")
-            .validator(validate_number)
-            .takes_value(true))
-        .arg(Arg::with_name("sets")
-             .help("Sets the number of sets")
-             .short("s")
-             .long("sets")
-             .default_value("5")
-             .validator(validate_number)
-             .takes_value(true))
-        .arg(Arg::with_name("work-set")
-             .help("Sets the weight of the work set.  Must be great than or equal to the bar weight.")
-             .index(1)
-             .required(true)
-             .validator(validate_number))
-        .get_matches();
+    let matches = cli::get_matches();
+    let cfg = Config::from_matches(&matches);
 
-    let bar_weight = value_t!(matches, "bar", u32).unwrap();
-    let work_set_weight = value_t!(matches, "work-set", u32).unwrap();
-    let sets = value_t!(matches, "sets", u32).unwrap();
-
-    set_weights(bar_weight, work_set_weight, sets);
+    get_sets(cfg.bar, cfg.work_set, cfg.sets);
 }
 
-fn set_weights(min: u32, max: u32, sets: u32) {
+fn get_sets(min: u32, max: u32, sets: u32) {
     // Delta weight between sets
     let numerator = (max - min) as f64;
     let denominator = (sets - 1) as f64;
@@ -58,7 +33,7 @@ fn set_weights(min: u32, max: u32, sets: u32) {
         let weight = cmp::min(weight, max);
 
         let plates = get_plates(weight - min);
-        println!("{:3}x{}x{} # {:?}", weight, get_reps(set, sets), get_sets(set, sets),
+        println!("{:3}x{}x{} # {:?}", weight, get_reps(set, sets), get_sub_sets(set, sets),
                  plates);
     }
 }
@@ -74,7 +49,7 @@ fn get_reps(set: u32, sets: u32) -> u32 {
     }
 }
 
-fn get_sets(set: u32, sets: u32) -> u32 {
+fn get_sub_sets(set: u32, sets: u32) -> u32 {
     let lower_bound = set == 0;
     let upper_bound = set == sets - 1;
 
@@ -126,8 +101,4 @@ fn get_plates(weight: u32) -> Vec<f64> {
     }
 
     panic!("no solution found");
-}
-
-fn validate_number(s: String) -> Result<(), String> {
-    s.parse::<usize>().map(|_|()).map_err(|err| err.to_string())
 }

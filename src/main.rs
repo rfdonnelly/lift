@@ -8,7 +8,7 @@ use std::cmp;
 use config::Config;
 
 fn main() {
-    let matches = cli::get_matches();
+    let matches = cli::build().get_matches();
     let cfg = Config::from_matches(&matches);
 
     get_sets(cfg.bar, cfg.work_set, cfg.sets);

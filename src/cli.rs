@@ -1,9 +1,8 @@
 use clap::App;
 use clap::Arg;
-use clap::ArgMatches;
 use clap::AppSettings;
 
-pub fn get_matches() -> ArgMatches<'static> {
+pub fn build<'a, 'b>() -> App<'a, 'b> {
     App::new(crate_name!())
         .setting(AppSettings::NextLineHelp)
         .about("\nLift helps with barbell lift planning.")
@@ -28,7 +27,6 @@ pub fn get_matches() -> ArgMatches<'static> {
              .index(1)
              .required(true)
              .validator(validate_number))
-        .get_matches()
 }
 
 fn validate_number(s: String) -> Result<(), String> {

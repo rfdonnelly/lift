@@ -50,15 +50,13 @@ fn get_reps(set: u32, sets: u32) -> u32 {
 }
 
 fn get_sub_sets(set: u32, sets: u32) -> u32 {
-    let lower_bound = set == 0;
-    let upper_bound = set == sets - 1;
+    let lower_bound = 0;
+    let upper_bound = sets - 1;
 
-    if lower_bound {
-        2
-    } else if upper_bound {
-        3
-    } else {
-        1
+    match set {
+        n if n == upper_bound => 3,
+        n if n == lower_bound => 2,
+        _ => 1,
     }
 }
 
@@ -107,6 +105,26 @@ fn get_plates(weight: u32) -> Vec<f64> {
 
 #[cfg(test)]
 mod tests {
+    mod get_sub_sets {
+        use super::super::*;
+
+        #[test]
+        fn min() {
+            assert_eq!(get_sub_sets(0, 5), 2);
+        }
+
+        #[test]
+        fn max() {
+            assert_eq!(get_sub_sets(4, 5), 3);
+            assert_eq!(get_sub_sets(0, 1), 3);
+        }
+
+        #[test]
+        fn mid() {
+            assert_eq!(get_sub_sets(3, 5), 1);
+        }
+    }
+
     mod get_plates {
         use super::super::*;
 

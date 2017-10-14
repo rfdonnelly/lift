@@ -76,12 +76,12 @@ fn get_plates(weight: u32) -> Vec<f64> {
 
     // Cap iterations to prevent infinite loop in case of no solution
     for _ in 0..10 {
-        let mut plate: f64;
+        let mut plate: f64 = 0.0;
         let sum = next_sum;
 
         // Eliminate (pop) available plates until we find one that doesn't exceed our desired
         // weight
-        loop {
+        while !available_plates.is_empty() {
             plate = available_plates.pop().unwrap();
             next_sum = sum + plate;
 
@@ -101,4 +101,45 @@ fn get_plates(weight: u32) -> Vec<f64> {
     }
 
     panic!("no solution found");
+}
+
+#[cfg(test)]
+mod tests {
+    mod get_plates {
+        use super::super::*;
+
+        #[test]
+        fn min() {
+            assert_eq!(get_plates(5), vec!(2.5));
+        }
+
+        #[test]
+        fn max() {
+            assert_eq!(get_plates(255), vec!(45.0, 35.0, 25.0, 10.0, 5.0, 5.0, 2.5));
+        }
+
+        #[test]
+        fn mid() {
+            assert_eq!(get_plates(90), vec!(45.0));
+            assert_eq!(get_plates(30), vec!(10.0, 5.0));
+        }
+
+        #[test]
+        #[should_panic(expected = "sum exceeds weight")]
+        fn too_small() {
+            get_plates(4);
+        }
+
+        #[test]
+        #[should_panic(expected = "no solution found")]
+        fn not_multiple_of_five() {
+            get_plates(6);
+        }
+
+        #[test]
+        #[should_panic(expected = "no solution found")]
+        fn too_large() {
+            get_plates(301);
+        }
+    }
 }

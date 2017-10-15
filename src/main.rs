@@ -70,36 +70,30 @@ fn get_sub_sets(set: u32, sets: u32) -> u32 {
 }
 
 fn get_plates(weight: u32) -> Vec<f64> {
-    let available_plates = vec![2.5, 5.0, 5.0, 10.0, 25.0, 35.0, 45.0];
-    let mut idx: i32 = (available_plates.len() as i32) - 1;
-    let mut required_plates: Vec<f64> = Vec::new();
-
     if weight == 0 {
         return Vec::new();
     }
 
-    let weight = weight as f64 / 2.0;
+    let available_plates = vec![45.0, 35.0, 25.0, 10.0, 5.0, 5.0, 2.5];
+    let mut required_plates: Vec<f64> = Vec::new();
+    let mut available_plates_iter = available_plates.iter();
 
+    let weight = weight as f64 / 2.0;
     let mut next_sum: f64 = 0.0;
 
     // Cap iterations to prevent infinite loop in case of no solution
     for _ in 0..10 {
-        let mut plate: f64 = 0.0;
         let sum = next_sum;
 
-        // Eliminate (pop) available plates until we find one that doesn't exceed our desired
-        // weight
-        while idx >= 0 {
-            plate = available_plates[idx as usize];
-            idx -= 1;
+        // Eliminate available plates until we find one that doesn't exceed our desired weight
+        while let Some(plate) = available_plates_iter.next() {
             next_sum = sum + plate;
 
             if next_sum <= weight {
+                required_plates.push(*plate);
                 break;
             }
-        }
-
-        required_plates.push(plate);
+        };
 
         // Are we done?
         if next_sum == weight {

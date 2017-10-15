@@ -16,17 +16,10 @@ fn main() {
 
 fn get_sets(min: u32, max: u32, sets: u32) {
     // Delta weight between sets
-    let numerator = (max - min) as f64;
-    let denominator = (sets - 1) as f64;
-    let delta = (numerator / denominator).floor() as u32;
+    let delta_preround = (max - min) / (sets - 1);
 
     // Round up to the nearest 5
-    let remainder = delta % 5;
-    let delta = if remainder > 0 {
-        delta + 5 - remainder
-    } else {
-        delta
-    };
+    let delta = round_up_5(delta_preround);
 
     for set in 0..sets {
         let weight = min + delta * set;
@@ -36,6 +29,10 @@ fn get_sets(min: u32, max: u32, sets: u32) {
         println!("{:3}x{}x{} # {:?}", weight, get_reps(set, sets), get_sub_sets(set, sets),
                  plates);
     }
+}
+
+fn round_up_5(x: u32) -> u32 {
+    (x + 4) / 5 * 5
 }
 
 fn get_reps(set: u32, sets: u32) -> u32 {
@@ -104,6 +101,21 @@ fn get_plates(weight: u32) -> Vec<f64> {
 
 #[cfg(test)]
 mod tests {
+    mod round_up_5 {
+        use super::super::*;
+
+        #[test]
+        fn compare() {
+            assert_eq!(round_up_5(0), 0);
+            assert_eq!(round_up_5(1), 5);
+            assert_eq!(round_up_5(2), 5);
+            assert_eq!(round_up_5(3), 5);
+            assert_eq!(round_up_5(4), 5);
+            assert_eq!(round_up_5(5), 5);
+            assert_eq!(round_up_5(6), 10);
+        }
+    }
+
     mod get_reps {
         use super::super::*;
 

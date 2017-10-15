@@ -3,32 +3,45 @@ extern crate clap;
 
 mod cli;
 mod config;
+mod set;
 
 use std::cmp;
+
 use config::Config;
+use set::Set;
 
 fn main() {
     let matches = cli::build().get_matches();
     let cfg = Config::from_matches(&matches);
 
-    get_sets(cfg.bar, cfg.work_set, cfg.sets);
+    let sets = get_sets(cfg.bar, cfg.work_set, cfg.sets);
+    print_sets(cfg.bar, &sets);
 }
 
-fn get_sets(min: u32, max: u32, sets: u32) {
-    // Delta weight between sets
-    let delta_preround = (max - min) / (sets - 1);
+fn print_sets(base: u32, sets: &Vec<Set>) {
+    for set in sets {
+        println!("{:>7} {:?}", set.to_string(), get_plates(set.weight - base));
+    }
+}
 
-    // Round up to the nearest 5
-    let delta = round_up_5(delta_preround);
+fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
+    let mut rv = Vec::new();
+    let delta = round_up_5((max - min) / (sets - 1));
 
     for set in 0..sets {
-        let weight = min + delta * set;
-        let weight = cmp::min(weight, max);
+        let weight = cmp::min(
+            min + delta * set,
+            max
+            );
 
-        let plates = get_plates(weight - min);
-        println!("{:3}x{}x{} # {:?}", weight, get_reps(set, sets), get_sub_sets(set, sets),
-                 plates);
+        rv.push(Set {
+            weight: weight,
+            reps: get_reps(set, sets),
+            sets: get_sub_sets(set, sets),
+        });
     }
+
+    rv
 }
 
 fn round_up_5(x: u32) -> u32 {

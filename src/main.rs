@@ -29,9 +29,15 @@ fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
     let delta = round_up_5((max - min) / (sets - 1));
 
     for set in 0..sets {
+        // This ensures weight for second to last set != last set
+        let set_max = match set {
+            n if n == sets - 1 => max,
+            _ => max - 5,
+        };
+
         let weight = cmp::min(
             min + delta * set,
-            max
+            set_max
             );
 
         rv.push(Set {
@@ -120,6 +126,33 @@ mod tests {
             assert_eq!(round_up_5(4), 5);
             assert_eq!(round_up_5(5), 5);
             assert_eq!(round_up_5(6), 10);
+        }
+    }
+
+    mod get_sets {
+        use super::super::*;
+
+        #[test]
+        fn typ() {
+            assert_eq!(
+                format!("{:?}", get_sets(45, 85, 5)),
+                "[45x5x2, 55x4x1, 65x3x1, 75x2x1, 85x5x3]");
+            assert_eq!(
+                format!("{:?}", get_sets(45, 105, 5)),
+                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 105x5x3]");
+        }
+
+        #[test]
+        fn fractional_delta() {
+            assert_eq!(
+                format!("{:?}", get_sets(45, 90, 5)),
+                "[45x5x2, 60x4x1, 75x3x1, 85x2x1, 90x5x3]");
+            assert_eq!(
+                format!("{:?}", get_sets(45, 95, 5)),
+                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 95x5x3]");
+            assert_eq!(
+                format!("{:?}", get_sets(45, 100, 5)),
+                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 100x5x3]");
         }
     }
 

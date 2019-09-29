@@ -15,9 +15,8 @@ struct Options {
     sets: u32,
 
     /// Sets the weight of the work set.  Must be great than or equal to the bar weight.
-    work_set:u32,
+    work_set: u32,
 }
-
 
 struct Set {
     weight: u32,
@@ -27,15 +26,13 @@ struct Set {
 
 impl fmt::Display for Set {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}x{}x{}",
-               self.weight, self.reps, self.sets)
+        write!(f, "{}x{}x{}", self.weight, self.reps, self.sets)
     }
 }
 
 impl fmt::Debug for Set {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}x{}x{}",
-               self.weight, self.reps, self.sets)
+        write!(f, "{}x{}x{}", self.weight, self.reps, self.sets)
     }
 }
 
@@ -65,10 +62,7 @@ fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
             _ => max - 5,
         };
 
-        let weight = cmp::min(
-            min + delta * set,
-            set_max
-            );
+        let weight = cmp::min(min + delta * set, set_max);
 
         rv.push(Set {
             weight: weight,
@@ -129,7 +123,7 @@ fn get_plates(weight: u32) -> Vec<f64> {
                 required_plates.push(*plate);
                 break;
             }
-        };
+        }
 
         // Are we done?
         if next_sum == weight {
@@ -166,23 +160,28 @@ mod tests {
         fn typ() {
             assert_eq!(
                 format!("{:?}", get_sets(45, 85, 5)),
-                "[45x5x2, 55x4x1, 65x3x1, 75x2x1, 85x5x3]");
+                "[45x5x2, 55x4x1, 65x3x1, 75x2x1, 85x5x3]"
+            );
             assert_eq!(
                 format!("{:?}", get_sets(45, 105, 5)),
-                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 105x5x3]");
+                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 105x5x3]"
+            );
         }
 
         #[test]
         fn fractional_delta() {
             assert_eq!(
                 format!("{:?}", get_sets(45, 90, 5)),
-                "[45x5x2, 60x4x1, 75x3x1, 85x2x1, 90x5x3]");
+                "[45x5x2, 60x4x1, 75x3x1, 85x2x1, 90x5x3]"
+            );
             assert_eq!(
                 format!("{:?}", get_sets(45, 95, 5)),
-                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 95x5x3]");
+                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 95x5x3]"
+            );
             assert_eq!(
                 format!("{:?}", get_sets(45, 100, 5)),
-                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 100x5x3]");
+                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 100x5x3]"
+            );
         }
     }
 

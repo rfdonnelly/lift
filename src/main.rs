@@ -1,21 +1,51 @@
-#[macro_use]
-extern crate clap;
-
-mod cli;
-mod config;
-mod set;
-
 use std::cmp;
+use std::fmt;
 
-use config::Config;
-use set::Set;
+use structopt::StructOpt;
+
+#[derive(StructOpt, Debug)]
+#[structopt(about, author)]
+struct Options {
+    /// The bar weight.
+    #[structopt(short, long, default_value = "45")]
+    bar: u32,
+
+    /// The number of sets.
+    #[structopt(short, long, default_value = "5")]
+    sets: u32,
+
+    /// Sets the weight of the work set.  Must be great than or equal to the bar weight.
+    work_set:u32,
+}
+
+
+struct Set {
+    weight: u32,
+    reps: u32,
+    sets: u32,
+}
+
+impl fmt::Display for Set {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}x{}x{}",
+               self.weight, self.reps, self.sets)
+    }
+}
+
+impl fmt::Debug for Set {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}x{}x{}",
+               self.weight, self.reps, self.sets)
+    }
+}
 
 fn main() {
-    let matches = cli::build().get_matches();
-    let cfg = Config::from_matches(&matches);
+    // let matches = cli::build().get_matches();
+    // let cfg = Config::from_matches(&matches);
+    let options = Options::from_args();
 
-    let sets = get_sets(cfg.bar, cfg.work_set, cfg.sets);
-    print_sets(cfg.bar, &sets);
+    let sets = get_sets(options.bar, options.work_set, options.sets);
+    print_sets(options.bar, &sets);
 }
 
 fn print_sets(base: u32, sets: &Vec<Set>) {

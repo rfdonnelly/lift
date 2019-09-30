@@ -2,7 +2,7 @@
 name = "lift"
 version = "0.1.0"
 edition = "2018"
-description = "Helps with barbell lift planning."
+description = "A calculator for strength training."
 authors = ["Rob Donnelly <rfdonnelly@gmail.com>"]
 
 [dependencies]

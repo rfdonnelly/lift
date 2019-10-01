@@ -4,7 +4,7 @@ A calculator for strength training.  Calculates warmup sets and barbell racking.
 
 ## Example
 
-Say you want to Squat 145lbs with 4 warmup sets and a 45lb bar.  Lift will calculate the weights and reps for each set.
+Say you want to Squat 145lbs with 4 warmup sets and a 45lb bar.  Lift will calculate the weights and reps for each set as well as the plates required for each set weight.
 
 ```
 $ lift --bar 45 --sets 4 145

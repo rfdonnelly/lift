@@ -3,6 +3,23 @@ use std::fmt;
 
 use structopt::StructOpt;
 
+const MAX_SETS: u32 = 6;
+const MAX_REPS: u32 = 5;
+
+fn parse_sets(s: &str) -> Result<u32, String> {
+    let value =
+    match u32::from_str_radix(s, 10) {
+        Ok(v) => v,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    if value > MAX_SETS {
+        return Err(format!("Must be {} or less", MAX_SETS));
+    }
+
+    Ok(value)
+}
+
 #[derive(StructOpt, Debug)]
 #[structopt(about, author)]
 struct Options {
@@ -11,7 +28,7 @@ struct Options {
     bar: u32,
 
     /// The number of sets.
-    #[structopt(short, long, default_value = "5")]
+    #[structopt(short, long, default_value = "5", parse(try_from_str = parse_sets))]
     sets: u32,
 
     /// Sets the weight of the work set.  Must be great than or equal to the bar weight.
@@ -79,7 +96,7 @@ fn round_up_5(x: u32) -> u32 {
 }
 
 fn get_reps(set: u32, sets: u32) -> u32 {
-    let max = 5;
+    let max = MAX_REPS;
     let upper_bound = sets - 1;
 
     match set {

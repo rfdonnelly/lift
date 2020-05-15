@@ -36,8 +36,11 @@ struct Options {
 }
 
 struct Set {
+    /// The total weight of the set
     weight: u32,
+    /// The number of repititions
     reps: u32,
+    /// The number of times the set is repeated
     repeat: u32,
 }
 

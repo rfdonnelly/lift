@@ -38,37 +38,34 @@ struct Options {
 struct Set {
     weight: u32,
     reps: u32,
-    sets: u32,
+    repeat: u32,
 }
 
 impl fmt::Display for Set {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}x{}x{}", self.weight, self.reps, self.sets)
+        write!(f, "{}x{}x{}", self.weight, self.reps, self.repeat)
     }
 }
 
 impl fmt::Debug for Set {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}x{}x{}", self.weight, self.reps, self.sets)
+        write!(f, "{}x{}x{}", self.weight, self.reps, self.repeat)
     }
 }
 
 fn main() {
-    // let matches = cli::build().get_matches();
-    // let cfg = Config::from_matches(&matches);
     let options = Options::from_args();
-
     let sets = get_sets(options.bar, options.work_set, options.sets);
     print_sets(options.bar, &sets);
 }
 
-fn print_sets(base: u32, sets: &Vec<Set>) {
+fn print_sets(base: u32, sets: &[Set]) {
     for set in sets {
         println!("{:>7} {:?}", set.to_string(), get_plates(set.weight - base));
     }
 }
 
-fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
+fn get_set_weights(min: u32, max: u32, sets: u32) -> Vec<u32> {
     let mut rv = Vec::new();
     let delta = round_up_5((max - min) / (sets - 1));
 
@@ -81,14 +78,22 @@ fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
 
         let weight = cmp::min(min + delta * set, set_max);
 
-        rv.push(Set {
-            weight: weight,
-            reps: get_reps(set, sets),
-            sets: get_sub_sets(set, sets),
-        });
+        rv.push(weight);
     }
 
     rv
+}
+
+fn get_sets(min: u32, max: u32, num_sets: u32) -> Vec<Set> {
+    get_set_weights(min, max, num_sets)
+        .iter()
+        .enumerate()
+        .map(|(set_idx, weight)| Set{
+            weight: *weight,
+            reps: get_reps(set_idx as u32, num_sets),
+            repeat: get_set_repeats(set_idx as u32, num_sets),
+        })
+        .collect()
 }
 
 fn round_up_5(x: u32) -> u32 {
@@ -105,7 +110,7 @@ fn get_reps(set: u32, sets: u32) -> u32 {
     }
 }
 
-fn get_sub_sets(set: u32, sets: u32) -> u32 {
+fn get_set_repeats(set: u32, sets: u32) -> u32 {
     let lower_bound = 0;
     let upper_bound = sets - 1;
 
@@ -230,23 +235,23 @@ mod tests {
         }
     }
 
-    mod get_sub_sets {
+    mod get_set_repeats {
         use super::super::*;
 
         #[test]
         fn min() {
-            assert_eq!(get_sub_sets(0, 5), 2);
+            assert_eq!(get_set_repeats(0, 5), 2);
         }
 
         #[test]
         fn max() {
-            assert_eq!(get_sub_sets(4, 5), 3);
-            assert_eq!(get_sub_sets(0, 1), 3);
+            assert_eq!(get_set_repeats(4, 5), 3);
+            assert_eq!(get_set_repeats(0, 1), 3);
         }
 
         #[test]
         fn mid() {
-            assert_eq!(get_sub_sets(3, 5), 1);
+            assert_eq!(get_set_repeats(3, 5), 1);
         }
     }
 

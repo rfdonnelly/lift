@@ -80,9 +80,9 @@ impl fmt::Debug for Set {
 fn main() {
     let options = Options::from_args();
     let set_weights = match options.dist {
-        Distribution::Classic => get_set_weights(options.bar, options.work_set, options.sets),
-        Distribution::Sin => weights_with_dist(options.bar, options.work_set, options.sets, dist_sin),
-        Distribution::Linear => weights_with_dist(options.bar, options.work_set, options.sets, dist_linear),
+        Distribution::Classic => block_weights_classic(options.bar, options.work_set, options.sets),
+        Distribution::Sin => block_weights_dist(options.bar, options.work_set, options.sets, dist_sin),
+        Distribution::Linear => block_weights_dist(options.bar, options.work_set, options.sets, dist_linear),
     };
     let sets = get_sets(&set_weights);
     print_sets(options.bar, &sets);
@@ -94,7 +94,7 @@ fn print_sets(base: u32, sets: &[Set]) {
     }
 }
 
-fn get_set_weights(min: u32, max: u32, sets: u32) -> Vec<u32> {
+fn block_weights_classic(min: u32, max: u32, sets: u32) -> Vec<u32> {
     let mut rv = Vec::new();
     let delta = round_up_5((max - min) / (sets - 1));
 
@@ -198,10 +198,10 @@ fn dist_linear(x: f32, _: f32) -> f32 {
 }
 
 fn weights(min: u32, max: u32, num_sets: u32) -> Vec<u32> {
-    weights_with_dist(min, max, num_sets, dist_linear)
+    block_weights_dist(min, max, num_sets, dist_linear)
 }
 
-fn weights_with_dist(min: u32, max: u32, num_sets: u32, dist: DistributionFn) -> Vec<u32> {
+fn block_weights_dist(min: u32, max: u32, num_sets: u32, dist: DistributionFn) -> Vec<u32> {
     let delta = max - min;
     let delta_normalized = delta as f32 / 5.0;
     let increment = delta_normalized / (num_sets - 1) as f32;
@@ -237,7 +237,7 @@ mod tests {
         }
     }
 
-    mod get_set_weights {
+    mod block_weights_classic {
         use super::super::*;
 
         #[test]
@@ -264,7 +264,7 @@ mod tests {
         #[test]
         fn dist_sin_fractional_delta() {
             assert_eq!(
-                weights_with_dist(45, 90, 5, dist_sin),
+                block_weights_dist(45, 90, 5, dist_sin),
                 vec![45, 60, 75, 85, 90],
             );
         }
@@ -272,7 +272,7 @@ mod tests {
         #[test]
         fn dist_sin_large() {
             assert_eq!(
-                weights_with_dist(65, 185, 4, dist_sin),
+                block_weights_dist(65, 185, 4, dist_sin),
                 vec![],
             );
         }
@@ -280,7 +280,7 @@ mod tests {
         #[test]
         fn dist_linear_large() {
             assert_eq!(
-                weights_with_dist(65, 185, 4, dist_linear),
+                block_weights_dist(65, 185, 4, dist_linear),
                 vec![],
             );
         }
@@ -288,11 +288,11 @@ mod tests {
         #[test]
         fn typ() {
             assert_eq!(
-                get_set_weights(45, 85, 5),
+                block_weights_classic(45, 85, 5),
                 vec![45, 55, 65, 75, 85],
             );
             assert_eq!(
-                get_set_weights(45, 105, 5),
+                block_weights_classic(45, 105, 5),
                 vec![45, 60, 75, 90, 105],
             );
         }
@@ -300,15 +300,15 @@ mod tests {
         #[test]
         fn fractional_delta() {
             assert_eq!(
-                get_set_weights(45, 90, 5),
+                block_weights_classic(45, 90, 5),
                 vec![45, 60, 75, 85, 90],
             );
             assert_eq!(
-                get_set_weights(45, 95, 5),
+                block_weights_classic(45, 95, 5),
                 vec![45, 60, 75, 90, 95],
             );
             assert_eq!(
-                get_set_weights(45, 100, 5),
+                block_weights_classic(45, 100, 5),
                 vec![45, 60, 75, 90, 100],
             );
         }
@@ -320,7 +320,7 @@ mod tests {
         #[test]
         fn basic() {
             assert_eq!(
-                format!("{:?}", get_sets(&get_set_weights(45, 85, 5))),
+                format!("{:?}", get_sets(&block_weights_classic(45, 85, 5))),
                 "[45x5x2, 55x4x1, 65x3x1, 75x2x1, 85x5x3]"
             );
         }

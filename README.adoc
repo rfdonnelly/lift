@@ -3,6 +3,8 @@
 A calculator for strength training.
 Calculates warmup sets and barbell racking.
 
+https://rfdonnelly.github.io/lift-rs[Try me!]
+
 == Example
 
 Say you want to Squat 145 lbs with 4 warmup sets and a 45 lbs bar.

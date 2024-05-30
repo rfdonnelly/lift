@@ -1,22 +1,26 @@
-# Lift
+= Lift
 
-A calculator for strength training.  Calculates warmup sets and barbell racking.
+A calculator for strength training.
+Calculates warmup sets and barbell racking.
 
-## Example
+== Example
 
-Say you want to Squat 145lbs with 4 warmup sets and a 45lb bar.  Lift will calculate the weights and reps for each set as well as the plates required for each set weight.
+Say you want to Squat 145 lbs with 4 warmup sets and a 45 lbs bar.
+Lift will calculate the weights and reps for each set as well as the plates required for each set weight.
 
-```
+[listing]
+----
 $ lift --bar 45 --sets 4 145
  45x5x2 []
  80x4x1 [10.0, 5.0, 2.5]
 115x3x1 [35.0]
 145x5x3 [45.0, 5.0]
-```
+----
 
-## Usage
+== Usage
 
-```
+[listing]
+----
 $ lift --help
 A calculator for strength training.
 
@@ -33,4 +37,4 @@ OPTIONS:
 
 ARGS:
     <work-set>    Sets the weight of the work set.  Must be great than or equal to the bar weight.
-```
+----

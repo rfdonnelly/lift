@@ -1,0 +1,8 @@
+[package]
+name = "lift-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lift = { path = ".." }
+structopt = "0.3"

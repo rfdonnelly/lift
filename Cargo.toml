@@ -1,9 +1,8 @@
 [package]
 name = "lift"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 description = "A calculator for strength training."
 authors = ["Rob Donnelly <rfdonnelly@gmail.com>"]
 
 [dependencies]
-structopt = "0.3"

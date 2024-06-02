@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 lift = { path = ".." }
-structopt = "0.3"
+clap = { version = "4", features = ["derive"] }

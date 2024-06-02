@@ -6,7 +6,7 @@
   </head>
   <body>
     <script type="module">
-      import init, { get_sets } from './pkg/lift_wasm.js';
+      import init, { supersets } from './pkg/lift_wasm.js';
 
       async function run() {
         await init();
@@ -38,7 +38,7 @@
         var bar = document.getElementById("bar").value;
         var sets = document.getElementById("sets").value;
         window.history.replaceState({}, '', location.pathname + '?work-set=' + work_set + '&bar=' + bar + '&sets=' + sets);
-        var output = get_sets(parseInt(bar), parseInt(work_set), parseInt(sets));
+        var output = supersets(parseInt(bar), parseInt(work_set), parseInt(sets));
         document.getElementById("output").innerHTML = output.replaceAll("\n", "<br/>");
         document.getElementById("permalink").href = location.href;
       }

@@ -33,11 +33,7 @@ impl SuperSet {
         let reps = reps(idx, num_supersets);
         let sets = sets(idx, num_supersets);
 
-        Self {
-            weight,
-            reps,
-            sets,
-        }
+        Self { weight, reps, sets }
     }
 }
 
@@ -86,7 +82,12 @@ fn weights(
         .map(move |x| x + min)
 }
 
-pub fn supersets(min: u32, max: u32, num_supersets: u32, distribution: Distribution) -> Vec<SuperSet> {
+pub fn supersets(
+    min: u32,
+    max: u32,
+    num_supersets: u32,
+    distribution: Distribution,
+) -> Vec<SuperSet> {
     let distribution = match distribution {
         Distribution::Linear => distribution_linear,
         Distribution::Sin => distribution_sin,

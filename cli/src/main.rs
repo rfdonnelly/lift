@@ -33,15 +33,12 @@ struct Options {
 }
 
 fn main() {
-    // let matches = cli::build().get_matches();
-    // let cfg = Config::from_matches(&matches);
     let options = Options::from_args();
-
     let sets = get_sets(options.bar, options.work_set, options.sets);
     print_sets(options.bar, &sets);
 }
 
-fn print_sets(base: u32, sets: &Vec<Set>) {
+fn print_sets(base: u32, sets: &[Set]) {
     for set in sets {
         println!("{:>7} {:?}", set.to_string(), get_plates(set.weight - base));
     }

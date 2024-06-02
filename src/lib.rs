@@ -21,27 +21,30 @@ impl fmt::Debug for Set {
     }
 }
 
-pub fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
-    let mut rv = Vec::new();
+fn get_set_weights(min: u32, max: u32, sets: u32) -> impl Iterator<Item = u32> {
     let delta = round_up_5((max - min) / (sets - 1));
 
-    for set in 0..sets {
-        // This ensures weight for second to last set != last set
-        let set_max = match set {
-            n if n == sets - 1 => max,
-            _ => max - 5,
-        };
+    (0..sets)
+        .map(move |set_idx| {
+            // This ensures weight for second to last set != last set
+            let set_max = match set_idx {
+                n if n == sets - 1 => max,
+                _ => max - 5,
+            };
 
-        let weight = cmp::min(min + delta * set, set_max);
+            cmp::min(min + delta * set_idx, set_max)
+        })
+}
 
-        rv.push(Set {
+pub fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
+    get_set_weights(min, max, sets)
+        .enumerate()
+        .map(|(set_idx, weight)| Set {
             weight: weight,
-            reps: get_reps(set, sets),
-            sets: get_sub_sets(set, sets),
-        });
-    }
-
-    rv
+            reps: get_reps(set_idx as u32, sets),
+            sets: get_sub_sets(set_idx as u32, sets),
+        })
+        .collect()
 }
 
 fn round_up_5(x: u32) -> u32 {

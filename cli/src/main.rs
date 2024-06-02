@@ -1,4 +1,4 @@
-use lift::{get_plates, get_sets, Distribution, Set};
+use lift::{plates, supersets, Distribution, SuperSet};
 
 use clap::Parser;
 
@@ -20,12 +20,12 @@ struct Cli {
 
 fn main() {
     let cli = Cli::parse();
-    let sets = get_sets(cli.bar, cli.work_set, cli.sets, Distribution::Sin);
+    let sets = supersets(cli.bar, cli.work_set, cli.sets, Distribution::Sin);
     print_sets(cli.bar, &sets);
 }
 
-fn print_sets(base: u32, sets: &[Set]) {
+fn print_sets(base: u32, sets: &[SuperSet]) {
     for set in sets {
-        println!("{:>7} {:?}", set.to_string(), get_plates(set.weight - base));
+        println!("{:>7} {:?}", set.to_string(), plates(set.weight - base));
     }
 }

@@ -1,16 +1,16 @@
 use wasm_bindgen::prelude::*;
 
-use lift::{Distribution, Set};
+use lift::{Distribution, SuperSet};
 
 #[wasm_bindgen]
-pub fn get_sets(min: u32, max: u32, sets: u32) -> String {
-    let sets = lift::get_sets(min, max, sets, Distribution::Sin);
+pub fn supersets(min: u32, max: u32, sets: u32) -> String {
+    let sets = lift::supersets(min, max, sets, Distribution::Sin);
     format_sets(min, &sets)
 }
 
-fn format_sets(base: u32, sets: &[Set]) -> String {
+fn format_sets(base: u32, sets: &[SuperSet]) -> String {
     sets.iter()
-        .map(|set| format!("{:>7} {:?}", set, lift::get_plates(set.weight - base)))
+        .map(|set| format!("{:>7} {:?}", set, lift::plates(set.weight - base)))
         .collect::<Vec<String>>()
         .join("\n")
 }

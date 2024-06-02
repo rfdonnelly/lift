@@ -11,22 +11,43 @@ pub enum Distribution {
 
 type DistributionFn = fn(f32, f32) -> f32;
 
-pub struct Set {
-    /// Total weight of the set
+/// Terminology
+///
+/// * Excercise - A group of supersets.
+/// * Supersets - A group of sets.
+/// * Set - A group of reps done back to back.  The bar is racked after each set.
+/// * Rep - The number of times the weight is lifted in one set.
+
+pub struct SuperSet {
+    /// The weight for each set
     pub weight: u32,
-    /// The number of repititions
+    /// The number of repitition for a single set
     reps: u32,
-    /// The number of times the set is repeated
+    /// The number of times sets in the superset
     sets: u32,
 }
 
-impl fmt::Display for Set {
+impl SuperSet {
+    fn new(idx: usize, weight: u32, num_supersets: u32) -> Self {
+        let idx = idx as u32;
+        let reps = reps(idx, num_supersets);
+        let sets = sets(idx, num_supersets);
+
+        Self {
+            weight,
+            reps,
+            sets,
+        }
+    }
+}
+
+impl fmt::Display for SuperSet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}x{}x{}", self.weight, self.reps, self.sets)
     }
 }
 
-impl fmt::Debug for Set {
+impl fmt::Debug for SuperSet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}x{}x{}", self.weight, self.reps, self.sets)
     }
@@ -41,17 +62,18 @@ fn distribution_sin(x: f32, delta_normalized: f32) -> f32 {
     delta_normalized * (PI * x / delta_normalized / 2.0).sin()
 }
 
+/// Returns the weight of each superset
 fn weights(
     min: u32,
     max: u32,
-    num_sets: u32,
+    num_supersets: u32,
     distribution: DistributionFn,
 ) -> impl Iterator<Item = u32> {
     let delta = max - min;
     let delta_normalized = delta as f32 / 5.0;
-    let increment = delta_normalized / (num_sets - 1) as f32;
+    let increment = delta_normalized / (num_supersets - 1) as f32;
 
-    (0..num_sets)
+    (0..num_supersets)
         // Create even spread
         .map(move |x| x as f32 * increment)
         // Distribute
@@ -64,44 +86,40 @@ fn weights(
         .map(move |x| x + min)
 }
 
-pub fn get_sets(min: u32, max: u32, sets: u32, distribution: Distribution) -> Vec<Set> {
+pub fn supersets(min: u32, max: u32, num_supersets: u32, distribution: Distribution) -> Vec<SuperSet> {
     let distribution = match distribution {
         Distribution::Linear => distribution_linear,
         Distribution::Sin => distribution_sin,
     };
 
-    weights(min, max, sets, distribution)
+    weights(min, max, num_supersets, distribution)
         .enumerate()
-        .map(|(set_idx, weight)| Set {
-            weight,
-            reps: get_reps(set_idx as u32, sets),
-            sets: get_sub_sets(set_idx as u32, sets),
-        })
+        .map(|(superset_idx, weight)| SuperSet::new(superset_idx, weight, num_supersets))
         .collect()
 }
 
-fn get_reps(set: u32, sets: u32) -> u32 {
+fn reps(superset_idx: u32, num_supersets: u32) -> u32 {
     let max = MAX_REPS;
-    let upper_bound = sets - 1;
+    let upper_bound = num_supersets - 1;
 
-    match set {
+    match superset_idx {
         n if n == upper_bound => max,
         n => cmp::max(max - n, 1),
     }
 }
 
-fn get_sub_sets(set: u32, sets: u32) -> u32 {
+fn sets(superset_idx: u32, num_supersets: u32) -> u32 {
     let lower_bound = 0;
-    let upper_bound = sets - 1;
+    let upper_bound = num_supersets - 1;
 
-    match set {
+    match superset_idx {
         n if n == upper_bound => 3,
         n if n == lower_bound => 2,
         _ => 1,
     }
 }
 
-pub fn get_plates(weight: u32) -> Vec<f64> {
+pub fn plates(weight: u32) -> Vec<f64> {
     if weight == 0 {
         return Vec::new();
     }
@@ -140,17 +158,17 @@ pub fn get_plates(weight: u32) -> Vec<f64> {
 
 #[cfg(test)]
 mod tests {
-    mod get_sets_linear {
+    mod supersets {
         use super::super::*;
 
         #[test]
         fn typ() {
             assert_eq!(
-                format!("{:?}", get_sets(45, 85, 5, Distribution::Sin)),
+                format!("{:?}", supersets(45, 85, 5, Distribution::Sin)),
                 "[45x5x2, 60x4x1, 70x3x1, 80x2x1, 85x5x3]"
             );
             assert_eq!(
-                format!("{:?}", get_sets(45, 105, 5, Distribution::Sin)),
+                format!("{:?}", supersets(45, 105, 5, Distribution::Sin)),
                 "[45x5x2, 65x4x1, 85x3x1, 100x2x1, 105x5x3]"
             );
         }
@@ -158,103 +176,103 @@ mod tests {
         #[test]
         fn fractional_delta() {
             assert_eq!(
-                format!("{:?}", get_sets(45, 90, 5, Distribution::Sin)),
+                format!("{:?}", supersets(45, 90, 5, Distribution::Sin)),
                 "[45x5x2, 60x4x1, 75x3x1, 85x2x1, 90x5x3]"
             );
             assert_eq!(
-                format!("{:?}", get_sets(45, 95, 5, Distribution::Sin)),
+                format!("{:?}", supersets(45, 95, 5, Distribution::Sin)),
                 "[45x5x2, 60x4x1, 80x3x1, 90x2x1, 95x5x3]"
             );
             assert_eq!(
-                format!("{:?}", get_sets(45, 100, 5, Distribution::Sin)),
+                format!("{:?}", supersets(45, 100, 5, Distribution::Sin)),
                 "[45x5x2, 65x4x1, 80x3x1, 95x2x1, 100x5x3]"
             );
         }
     }
 
-    mod get_reps {
+    mod reps {
         use super::super::*;
 
         #[test]
         fn min() {
-            assert_eq!(get_reps(0, 5), 5);
+            assert_eq!(reps(0, 5), 5);
         }
 
         #[test]
         fn mid_nominal() {
-            assert_eq!(get_reps(1, 5), 4);
-            assert_eq!(get_reps(2, 5), 3);
-            assert_eq!(get_reps(3, 5), 2);
-            assert_eq!(get_reps(4, 6), 1);
+            assert_eq!(reps(1, 5), 4);
+            assert_eq!(reps(2, 5), 3);
+            assert_eq!(reps(3, 5), 2);
+            assert_eq!(reps(4, 6), 1);
         }
 
         #[test]
         fn mid_min() {
-            assert_eq!(get_reps(5, 7), 1);
-            assert_eq!(get_reps(5, 9), 1);
+            assert_eq!(reps(5, 7), 1);
+            assert_eq!(reps(5, 9), 1);
         }
 
         #[test]
         fn max() {
-            assert_eq!(get_reps(4, 5), 5);
+            assert_eq!(reps(4, 5), 5);
         }
     }
 
-    mod get_sub_sets {
+    mod sets {
         use super::super::*;
 
         #[test]
         fn min() {
-            assert_eq!(get_sub_sets(0, 5), 2);
+            assert_eq!(sets(0, 5), 2);
         }
 
         #[test]
         fn max() {
-            assert_eq!(get_sub_sets(4, 5), 3);
-            assert_eq!(get_sub_sets(0, 1), 3);
+            assert_eq!(sets(4, 5), 3);
+            assert_eq!(sets(0, 1), 3);
         }
 
         #[test]
         fn mid() {
-            assert_eq!(get_sub_sets(3, 5), 1);
+            assert_eq!(sets(3, 5), 1);
         }
     }
 
-    mod get_plates {
+    mod plates {
         use super::super::*;
 
         #[test]
         fn min() {
-            assert_eq!(get_plates(5), vec!(2.5));
+            assert_eq!(plates(5), vec!(2.5));
         }
 
         #[test]
         fn max() {
-            assert_eq!(get_plates(255), vec!(45.0, 35.0, 25.0, 10.0, 5.0, 5.0, 2.5));
+            assert_eq!(plates(255), vec!(45.0, 35.0, 25.0, 10.0, 5.0, 5.0, 2.5));
         }
 
         #[test]
         fn mid() {
-            assert_eq!(get_plates(90), vec!(45.0));
-            assert_eq!(get_plates(30), vec!(10.0, 5.0));
+            assert_eq!(plates(90), vec!(45.0));
+            assert_eq!(plates(30), vec!(10.0, 5.0));
         }
 
         #[test]
         #[should_panic(expected = "sum exceeds weight")]
         fn too_small() {
-            get_plates(4);
+            plates(4);
         }
 
         #[test]
         #[should_panic(expected = "no solution found")]
         fn not_multiple_of_five() {
-            get_plates(6);
+            plates(6);
         }
 
         #[test]
         #[should_panic(expected = "no solution found")]
         fn too_large() {
-            get_plates(301);
+            plates(301);
         }
     }
 }

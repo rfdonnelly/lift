@@ -4,8 +4,11 @@ use std::fmt;
 const MAX_REPS: u32 = 5;
 
 pub struct Set {
+    /// Total weight of the set
     pub weight: u32,
+    /// The number of repititions
     reps: u32,
+    /// The number of times the set is repeated
     sets: u32,
 }
 

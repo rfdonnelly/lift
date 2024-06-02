@@ -25,7 +25,7 @@ struct Options {
     bar: u32,
 
     /// The number of sets.
-    #[structopt(short, long, default_value = "5", parse(try_from_str = parse_sets))]
+    #[structopt(short, long, default_value = "4", parse(try_from_str = parse_sets))]
     sets: u32,
 
     /// Sets the weight of the work set.  Must be great than or equal to the bar weight.

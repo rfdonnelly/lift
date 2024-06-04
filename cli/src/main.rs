@@ -1,4 +1,4 @@
-use lift::{get_plates, get_sets, Set};
+use lift::{get_plates, get_sets, Set, Distribution};
 
 use clap::Parser;
 
@@ -19,7 +19,7 @@ struct Cli {
 
 fn main() {
     let cli = Cli::parse();
-    let sets = get_sets(cli.bar, cli.work_set, cli.sets);
+    let sets = get_sets(cli.bar, cli.work_set, cli.sets, Distribution::Sin);
     print_sets(cli.bar, &sets);
 }
 

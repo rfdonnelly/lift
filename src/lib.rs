@@ -1,7 +1,15 @@
 use std::cmp;
 use std::fmt;
+use std::f32::consts::PI;
 
 const MAX_REPS: u32 = 5;
+
+pub enum Distribution {
+    Linear,
+    Sin,
+}
+
+type DistributionFn = fn(f32, f32) -> f32;
 
 pub struct Set {
     /// Total weight of the set
@@ -24,23 +32,40 @@ impl fmt::Debug for Set {
     }
 }
 
-fn get_set_weights(min: u32, max: u32, sets: u32) -> impl Iterator<Item = u32> {
-    let delta = round_up_5((max - min) / (sets - 1));
-
-    (0..sets)
-        .map(move |set_idx| {
-            // This ensures weight for second to last set != last set
-            let set_max = match set_idx {
-                n if n == sets - 1 => max,
-                _ => max - 5,
-            };
-
-            cmp::min(min + delta * set_idx, set_max)
-        })
+fn distribution_linear(x: f32, _delta_normalized: f32) -> f32 {
+    dbg!(&(x, x.ceil(), _delta_normalized));
+    x.ceil()
 }
 
-pub fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
-    get_set_weights(min, max, sets)
+fn distribution_sin(x: f32, delta_normalized: f32) -> f32 {
+    delta_normalized * (PI * x / delta_normalized / 2.0).sin()
+}
+
+fn weights(min: u32, max: u32, num_sets: u32, distribution: DistributionFn) -> impl Iterator<Item = u32> {
+    let delta = max - min;
+    let delta_normalized = delta as f32 / 5.0;
+    let increment = delta_normalized / (num_sets - 1) as f32;
+
+    (0..num_sets)
+        // Create even spread
+        .map(move |x| x as f32 * increment)
+        // Distribute
+        .map(move |x| distribution(x, delta_normalized))
+        // Convert
+        .map(|x| x as u32)
+        // Denormalize
+        .map(|x| x * 5)
+        // Offset
+        .map(move |x| x + min)
+}
+
+pub fn get_sets(min: u32, max: u32, sets: u32, distribution: Distribution) -> Vec<Set> {
+    let distribution = match distribution {
+        Distribution::Linear => distribution_linear,
+        Distribution::Sin => distribution_sin,
+    };
+
+    weights(min, max, sets, distribution)
         .enumerate()
         .map(|(set_idx, weight)| Set {
             weight: weight,
@@ -48,10 +73,6 @@ pub fn get_sets(min: u32, max: u32, sets: u32) -> Vec<Set> {
             sets: get_sub_sets(set_idx as u32, sets),
         })
         .collect()
-}
-
-fn round_up_5(x: u32) -> u32 {
-    (x + 4) / 5 * 5
 }
 
 fn get_reps(set: u32, sets: u32) -> u32 {
@@ -114,49 +135,34 @@ pub fn get_plates(weight: u32) -> Vec<f64> {
 
 #[cfg(test)]
 mod tests {
-    mod round_up_5 {
-        use super::super::*;
-
-        #[test]
-        fn compare() {
-            assert_eq!(round_up_5(0), 0);
-            assert_eq!(round_up_5(1), 5);
-            assert_eq!(round_up_5(2), 5);
-            assert_eq!(round_up_5(3), 5);
-            assert_eq!(round_up_5(4), 5);
-            assert_eq!(round_up_5(5), 5);
-            assert_eq!(round_up_5(6), 10);
-        }
-    }
-
-    mod get_sets {
+    mod get_sets_linear {
         use super::super::*;
 
         #[test]
         fn typ() {
             assert_eq!(
-                format!("{:?}", get_sets(45, 85, 5)),
-                "[45x5x2, 55x4x1, 65x3x1, 75x2x1, 85x5x3]"
+                format!("{:?}", get_sets(45, 85, 5, Distribution::Sin)),
+                "[45x5x2, 60x4x1, 70x3x1, 80x2x1, 85x5x3]"
             );
             assert_eq!(
-                format!("{:?}", get_sets(45, 105, 5)),
-                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 105x5x3]"
+                format!("{:?}", get_sets(45, 105, 5, Distribution::Sin)),
+                "[45x5x2, 65x4x1, 85x3x1, 100x2x1, 105x5x3]"
             );
         }
 
         #[test]
         fn fractional_delta() {
             assert_eq!(
-                format!("{:?}", get_sets(45, 90, 5)),
+                format!("{:?}", get_sets(45, 90, 5, Distribution::Sin)),
                 "[45x5x2, 60x4x1, 75x3x1, 85x2x1, 90x5x3]"
             );
             assert_eq!(
-                format!("{:?}", get_sets(45, 95, 5)),
-                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 95x5x3]"
+                format!("{:?}", get_sets(45, 95, 5, Distribution::Sin)),
+                "[45x5x2, 60x4x1, 80x3x1, 90x2x1, 95x5x3]"
             );
             assert_eq!(
-                format!("{:?}", get_sets(45, 100, 5)),
-                "[45x5x2, 60x4x1, 75x3x1, 90x2x1, 100x5x3]"
+                format!("{:?}", get_sets(45, 100, 5, Distribution::Sin)),
+                "[45x5x2, 65x4x1, 80x3x1, 95x2x1, 100x5x3]"
             );
         }
     }

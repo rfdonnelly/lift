@@ -27,6 +27,12 @@
         }
       }
 
+      window.copyToClipboard = function copyToClipboard() {
+        const text = document.getElementById("output").innerText;
+        navigator.clipboard.writeText(text);
+        return false;
+      }
+
       window.generateOutput = function generateOutput() {
         var work_set = document.getElementById("work_set").value;
         var bar = document.getElementById("bar").value;
@@ -80,8 +86,9 @@
     </div>
 
     <div style="padding-top: 1em; padding-bottom: 1em;">
-      <a href="https://github.com/rfdonnelly/lift-rs">Source</a>
+      <div><a href="javascript:void(0);" onclick="copyToClipboard()">Copy to clipboard</a></div>
       <div id="permalink"></div>
+      <div><a href="https://github.com/rfdonnelly/lift-rs">Source</a></div>
     </div>
   </body>
 </html>

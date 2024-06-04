@@ -40,7 +40,7 @@
         window.history.replaceState({}, '', location.pathname + '?work-set=' + work_set + '&bar=' + bar + '&sets=' + sets);
         var output = get_sets(parseInt(bar), parseInt(work_set), parseInt(sets));
         document.getElementById("output").innerHTML = output.replaceAll("\n", "<br/>");
-        document.getElementById("permalink").innerHTML = "<a href='" + location.href + "'>Permalink</a>";
+        document.getElementById("permalink").href = location.href;
       }
 
       run();
@@ -87,7 +87,7 @@
 
     <div style="padding-top: 1em; padding-bottom: 1em;">
       <div><a href="javascript:void(0);" onclick="copyToClipboard()">Copy to clipboard</a></div>
-      <div id="permalink"></div>
+      <div><a id="permalink" href="#">Permalink</a></div>
       <div><a href="https://github.com/rfdonnelly/lift-rs">Source</a></div>
     </div>
   </body>

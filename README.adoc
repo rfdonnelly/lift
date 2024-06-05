@@ -1,12 +1,12 @@
 = Lift
 
-[link=https://github.com/rfdonnelly/lift-rs/actions/workflows/ci.yml]
-image::https://github.com/rfdonnelly/lift-rs/actions/workflows/ci.yml/badge.svg[CI]
+[link=https://github.com/rfdonnelly/lift/actions/workflows/ci.yml]
+image::https://github.com/rfdonnelly/lift/actions/workflows/ci.yml/badge.svg[CI]
 
 A calculator for strength training.
 Calculates warmup sets and barbell racking.
 
-https://rfdonnelly.github.io/lift-rs[Try me!]
+https://rfdonnelly.github.io/lift[Try me!]
 
 == Example
 

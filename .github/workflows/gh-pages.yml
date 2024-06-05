@@ -20,7 +20,8 @@ jobs:
 
     - name: Upload Pages
       uses: actions/upload-pages-artifact@v3
-      path: wasm/pkg wasm/index.html
+      with:
+        path: wasm/pkg wasm/index.html
 
   deploy:
     needs: build

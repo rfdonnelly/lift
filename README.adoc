@@ -10,7 +10,7 @@ https://rfdonnelly.github.io/lift-rs[Try me!]
 
 == Example
 
-Say you want to Squat 145 lbs with 4 warmup sets and a 45 lbs bar.
+Say you want to squat 145 lbs with 3 warmup sets and a 45 lbs bar.
 Lift will calculate the weights and reps for each set as well as the plates required for each set weight.
 
 [listing]

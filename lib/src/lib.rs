@@ -73,7 +73,7 @@ pub fn get_sets(min: u32, max: u32, sets: u32, distribution: Distribution) -> Ve
     weights(min, max, sets, distribution)
         .enumerate()
         .map(|(set_idx, weight)| Set {
-            weight: weight,
+            weight,
             reps: get_reps(set_idx as u32, sets),
             sets: get_sub_sets(set_idx as u32, sets),
         })
@@ -106,7 +106,7 @@ pub fn get_plates(weight: u32) -> Vec<f64> {
         return Vec::new();
     }
 
-    let available_plates = vec![45.0, 35.0, 25.0, 10.0, 5.0, 5.0, 2.5];
+    let available_plates = [45.0, 35.0, 25.0, 10.0, 5.0, 5.0, 2.5];
     let mut required_plates: Vec<f64> = Vec::new();
     let mut available_plates_iter = available_plates.iter();
 
@@ -118,7 +118,7 @@ pub fn get_plates(weight: u32) -> Vec<f64> {
         let sum = next_sum;
 
         // Eliminate available plates until we find one that doesn't exceed our desired weight
-        while let Some(plate) = available_plates_iter.next() {
+        for plate in available_plates_iter.by_ref() {
             next_sum = sum + plate;
 
             if next_sum <= weight {

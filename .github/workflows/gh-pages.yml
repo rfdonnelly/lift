@@ -16,7 +16,7 @@ jobs:
       run: cargo install wasm-pack
 
     - name: Build WASM
-      working-directroy: wasm
+      working-directory: wasm
       run: wasm-pack build --target web
 
     - name: Publish

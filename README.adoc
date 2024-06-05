@@ -1,5 +1,8 @@
 = Lift
 
+[link=https://github.com/rfdonnelly/lift-rs/actions/workflows/ci.yml]
+image::https://github.com/rfdonnelly/lift-rs/actions/workflows/ci.yml/badge.svg[CI]
+
 A calculator for strength training.
 Calculates warmup sets and barbell racking.
 

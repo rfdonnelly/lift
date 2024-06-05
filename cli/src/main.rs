@@ -4,6 +4,7 @@ use clap::Parser;
 
 #[derive(Parser)]
 #[command(version, about)]
+/// A calculator for strength training.
 struct Cli {
     /// The bar weight.
     #[arg(short, long, default_value = "45")]

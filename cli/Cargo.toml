@@ -6,3 +6,7 @@ edition = "2021"
 [dependencies]
 lift = { path = "../lib" }
 clap = { version = "4", features = ["derive"] }
+
+[[bin]]
+name = "lift"
+path = "src/main.rs"

@@ -2,15 +2,14 @@ name: GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [$default-branch]
 
 jobs:
-  gh-pages:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install depedencies
       run: cargo install wasm-pack
@@ -19,13 +18,16 @@ jobs:
       working-directory: wasm
       run: wasm-pack build --target web
 
-    - name: Publish
-      run: |
-        git clone $(git remote get-url origin) --branch gh-pages pages
-        git -C pages rm '*'
-        cp -R wasm/pkg wasm/index.html pages
-        git -C pages add . --force
-        git -C pages config user.name github-actions[bot]
-        git -C pages config user.email 41898282+github-actions[bot]@users.noreply.github.com
-        git -C pages commit -m "Publish commit $(git rev-parse HEAD --short)"
-        git -C pages push
+    - name: Upload Pages
+      uses: actions/upload-pages-artifact@v3
+      path: wasm/pkg wasm/index.html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+    - name: Deploy Pages
+      uses: actions/deploy-pages@v4

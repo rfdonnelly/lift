@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-use lift::{Set, Distribution};
+use lift::{Distribution, Set};
 
 #[wasm_bindgen]
 pub fn get_sets(min: u32, max: u32, sets: u32) -> String {
@@ -9,8 +9,7 @@ pub fn get_sets(min: u32, max: u32, sets: u32) -> String {
 }
 
 fn format_sets(base: u32, sets: &[Set]) -> String {
-    sets
-        .iter()
+    sets.iter()
         .map(|set| format!("{:>7} {:?}", set, lift::get_plates(set.weight - base)))
         .collect::<Vec<String>>()
         .join("\n")

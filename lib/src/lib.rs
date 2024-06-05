@@ -1,6 +1,6 @@
 use std::cmp;
-use std::fmt;
 use std::f32::consts::PI;
+use std::fmt;
 
 const MAX_REPS: u32 = 5;
 
@@ -41,7 +41,12 @@ fn distribution_sin(x: f32, delta_normalized: f32) -> f32 {
     delta_normalized * (PI * x / delta_normalized / 2.0).sin()
 }
 
-fn weights(min: u32, max: u32, num_sets: u32, distribution: DistributionFn) -> impl Iterator<Item = u32> {
+fn weights(
+    min: u32,
+    max: u32,
+    num_sets: u32,
+    distribution: DistributionFn,
+) -> impl Iterator<Item = u32> {
     let delta = max - min;
     let delta_normalized = delta as f32 / 5.0;
     let increment = delta_normalized / (num_sets - 1) as f32;

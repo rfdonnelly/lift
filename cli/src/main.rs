@@ -1,4 +1,4 @@
-use lift::{get_plates, get_sets, Set, Distribution};
+use lift::{get_plates, get_sets, Distribution, Set};
 
 use clap::Parser;
 

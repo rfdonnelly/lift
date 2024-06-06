@@ -49,9 +49,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/download-artifact@master
+      - uses: actions/download-artifact@v4
         with:
           name: github-pages
+          path: pages.tar
+      - run: |
+          tar xf pages.tar
+          rm pages.tar
       - name: Deploy Pages
         uses: cloudflare/wrangler-action@v3
         with:

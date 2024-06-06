@@ -55,7 +55,7 @@ jobs:
       - run: |
           tar xf artifact.tar
           rm artifact.tar
-          ls -l
+          ls -lR
       - name: Deploy Pages
         uses: cloudflare/wrangler-action@v3
         with:

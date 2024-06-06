@@ -28,7 +28,7 @@ jobs:
       with:
         path: pages
 
-  deploy:
+  deploy-github-pages:
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -40,3 +40,18 @@ jobs:
     steps:
     - name: Deploy Pages
       uses: actions/deploy-pages@v4
+
+  deploy-cloudflare-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: pages

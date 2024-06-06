@@ -54,6 +54,7 @@ jobs:
           name: github-pages
           path: pages.tar
       - run: |
+          ls -l pages.tar
           tar xf pages.tar
           rm pages.tar
       - name: Deploy Pages
